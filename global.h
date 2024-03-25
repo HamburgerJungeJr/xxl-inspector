@@ -453,6 +453,12 @@ extern char title[];
 extern IDirect3DDevice9 *gamed3ddev;
 extern FILE *logfile;
 
+extern uint keyMapUi;
+extern uint keyMapSwitchCharacter;
+extern uint keyMapDropBomb;
+extern bool showUiOnStart;
+extern bool showInfoOnStart;
+
 extern void *odmvtbld[], *devvtbld[];
 
 extern SGameStartInfo* gameStartInfo;

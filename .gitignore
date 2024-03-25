@@ -37,3 +37,4 @@
 test*.bat
 *.asm
 *.pdb
+.vs/

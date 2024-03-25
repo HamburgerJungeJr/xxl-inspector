@@ -17,6 +17,11 @@ std::map<int, char*> classNames[15];
 std::map<KClass*, char*> lvlObjectNames[32];
 std::map<KClass*, char*> gameObjectNames;
 uint lvlNumSectors = 0;
+uint keyMapUi = 572;
+uint keyMapSwitchCharacter = 573;
+uint keyMapDropBomb = 575;
+bool showUiOnStart = false;
+bool showInfoOnStart = false;
 
 bool enableCrateRandomizer = false;
 
@@ -676,16 +681,42 @@ int VerifyVersion()
 
 void ReadSettings()
 {
-	FILE *f; char li[128], s[64]; int p;
+	FILE *f; char li[128], s[64]; uint p;
 	li[127] = s[63] = 0;
 	f = fopen("xxl_inspector_config.txt", "r");
 	if(!f) return;
 	while(!feof(f))
 	{
 		fgets(li, 127, f);
-		sscanf(li, "%63s %i", s, &p);
+		sscanf(li, "%63s = %i", s, &p);
 		//if(!stricmp(s, "higher_time_precision"))
 		//	setting_higher_time_precision = p;
+		
+		if (0 == stricmp(s, "keymap_ui")) {
+			keyMapUi = p;
+		}
+		if (0 == stricmp(s, "keymap_switch_charakter")) {
+			keyMapSwitchCharacter = p;
+		}
+		if (0 == stricmp(s, "keymap_drop_bomb")) {
+			keyMapDropBomb = p;
+		}
+		if (0 == stricmp(s, "show_ui_on_start")) {
+			if (0 == p) {
+				showUiOnStart = false;
+			}
+			if (1 == p) {
+				showUiOnStart = true;
+			}
+		}
+		if (0 == stricmp(s, "show_info_on_start")) {
+			if (0 == p) {
+				showInfoOnStart = false;
+			}
+			if (1 == p) {
+				showInfoOnStart = true;
+			}
+		}
 	}
 	fclose(f);
 }
@@ -701,7 +732,10 @@ void PatchStart()
 	// Open log file.
 	//logfile = fopen("xxl_inspector_log.txt", "w");
 
-	MessageBox(0, "XXL Inspector for " XXLNAME " enabled!", title, 64);
+	if (showInfoOnStart) {
+		MessageBox(0, "XXL Inspector for " XXLNAME " enabled!", title, 64);
+	}
+	
 	PatchStart_XXL();
 
 	// Restore entry point code.

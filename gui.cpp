@@ -1,6 +1,8 @@
 
 #include "global.h"
 
+#include <string>
+
 #include "imgui/imgui.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_opengl3.h"
@@ -31,6 +33,10 @@ void IGInit()
 	ImGui_ImplDX9_Init(gamed3ddev);
 #endif
 	ImGui::StyleColorsClassic();
+
+	if (showInfoOnStart) {
+		MessageBox(0, (std::string("Show/Hide UI: ") + ImGui::GetKeyName((ImGuiKey)keyMapUi) + "\nSwitch character: " + ImGui::GetKeyName((ImGuiKey)keyMapSwitchCharacter) + "\nDrop-Bomb cheat: " + ImGui::GetKeyName((ImGuiKey)keyMapDropBomb)).c_str(), "Current Keymap", 64);
+	}
 }
 
 bool showSceneTree = false, showSelectedObject = false, showObjectTree = false,
@@ -255,7 +261,7 @@ void IGCheats()
 
 	KGroup *trio = (KGroup*)GetLvlObject(4, 12, 0);
 	if(trio) {
-		if(ImGui::Button("Switch (F2)"))
+		if(ImGui::Button((std::string("Switch (") + ImGui::GetKeyName((ImGuiKey)keyMapSwitchCharacter) + ")").c_str()))
 			trio->sendEvent(0x4800 | (*((char*)trio + 0x2D) ? 1 : 0), (void*)0);
 	}
 
@@ -263,7 +269,7 @@ void IGCheats()
 	// KClass *projBomb, Vector3 *pos, Vector3 *dest, float unk2 = 25.0f, CHkBoss *boss, Vector3 *unk4 = (0,0,0), float unk5 = 1.4f
 	if(projBomb && (asterixHook || obelixHook)) {
 		ImGui::SameLine();
-		if(ImGui::Button("Drop bomb (F3)"))
+		if(ImGui::Button((std::string("Drop Bomb (") + ImGui::GetKeyName((ImGuiKey)keyMapDropBomb) + ")").c_str()))
 			SpawnBombFromAllHeroes(projBomb, nullptr, asterixHook, obelixHook);
 	}
 #endif
@@ -507,7 +513,7 @@ void IGSelectedObject()
 		ImGui::Text("%s (%i,%i) at 0x%p", getClassName(grp, id), grp, id, obj);
 		ImGui::Text("%s", getObjectName(obj));
 		static char eventinput[10], eventparam[12]; static int eventresult = -1;
-		ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2);
+		ImGui::PushItemWidth(ImGui::GetContentRegionAvail().x / 2);
 		ImGui::InputTextWithHint("##EventInput", "Event ID", eventinput, 9, ImGuiInputTextFlags_CharsHexadecimal);
 		ImGui::SameLine();
 		ImGui::PushItemWidth(-1);
@@ -778,18 +784,18 @@ void IGNewFrame()
 
 	ImGui::NewFrame();
 
-	static bool showMainWindow = true;
-	if(ImGui::IsKeyPressed(VK_F1))
+	static bool showMainWindow = showUiOnStart;
+	if(ImGui::IsKeyPressed((ImGuiKey)keyMapUi))
 		showMainWindow = !showMainWindow;
 #if XXLVER == 1
-	if(ImGui::IsKeyPressed(VK_F2)) {
+	if(ImGui::IsKeyPressed((ImGuiKey)keyMapSwitchCharacter)) {
 		KGroup *trio = (KGroup*)GetLvlObject(4, 12, 0);
 		if(trio) {
 			trio->sendEvent(0x4800 | (*((char*)trio + 0x2D) ? 1 : 0), (void*)0);
 		}
 	}
 #ifndef REMASTER
-	if(ImGui::IsKeyPressed(VK_F3)) {
+	if(ImGui::IsKeyPressed((ImGuiKey)keyMapDropBomb)) {
 		KClass *projBomb = GetLvlObject(12, 79, 0);
 		//KHook *hkBoss = (KHook*)GetLvlObject(2, 177, 0);
 		KHook *asterixHook = (KHook*)GetLvlObject(2, 28, 0);
